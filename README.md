@@ -1,17 +1,20 @@
-# flutter_clean_architecture_demo
+# Flutter Clean Architecture Demo
 
-A new Flutter project.
+A Flutter project demonstrating:
 
-## Getting Started
+- Feature-first architecture
+- Riverpod state management
+- Dio networking
+- Repository pattern
+- Clean Architecture principles
 
-This project is a starting point for a Flutter application.
+## Tech Stack
 
-A few resources to get you started if this is your first Flutter project:
+- Flutter
+- Riverpod
+- Dio
+- Go Router
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Status
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+🚧 In Progress
