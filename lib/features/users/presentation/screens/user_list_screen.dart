@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/user_provider.dart';
 import '../widgets/user_card.dart';
+import 'user_details_screen.dart';
 
 class UserListScreen extends ConsumerWidget {
   const UserListScreen({super.key});
@@ -25,7 +26,12 @@ class UserListScreen extends ConsumerWidget {
               return UserCard(
                 user: users[index],
                 onTap: () {
-                  // Handle user tap, e.g., navigate to user details
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => UserDetailsScreen(user: users[index]),
+                    ),
+                  );
                 },
               );
             },
