@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/user_provider.dart';
+import '../widgets/user_card.dart';
 
 class UserListScreen extends ConsumerWidget {
   const UserListScreen({super.key});
@@ -21,7 +22,12 @@ class UserListScreen extends ConsumerWidget {
           return ListView.builder(
             itemCount: users.length,
             itemBuilder: (_, index) {
-              return Text(users[index].name);
+              return UserCard(
+                user: users[index],
+                onTap: () {
+                  // Handle user tap, e.g., navigate to user details
+                },
+              );
             },
           );
         },
