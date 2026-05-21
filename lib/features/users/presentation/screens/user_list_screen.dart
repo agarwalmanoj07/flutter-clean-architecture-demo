@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/routes/app_router.dart';
 import '../providers/user_provider.dart';
 import '../widgets/user_card.dart';
-import 'user_details_screen.dart';
 
 class UserListScreen extends ConsumerWidget {
   const UserListScreen({super.key});
@@ -26,12 +27,7 @@ class UserListScreen extends ConsumerWidget {
               return UserCard(
                 user: users[index],
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => UserDetailsScreen(user: users[index]),
-                    ),
-                  );
+                  context.push(AppRoutes.userDetails, extra: users[index]);
                 },
               );
             },
