@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routes/app_router.dart';
+import '../../../../core/widgets/error_view.dart';
 import '../providers/user_provider.dart';
 import '../widgets/user_card.dart';
 
@@ -18,7 +19,7 @@ class UserListScreen extends ConsumerWidget {
       body: users.when(
         loading: () => const CircularProgressIndicator(),
 
-        error: (e, s) => Text(e.toString()),
+        error: (e, s) => ErrorView(message: e.toString()),
 
         data: (users) {
           return ListView.builder(
