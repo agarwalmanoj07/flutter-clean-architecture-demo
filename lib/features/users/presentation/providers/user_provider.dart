@@ -4,6 +4,7 @@ import '../../../../core/networks/dio_provider.dart';
 import '../../data/models/user.dart';
 import '../../data/repositories/user_repository.dart';
 import '../../data/datasources/user_remote_datasource.dart';
+import 'users_notifier.dart';
 
 final userRemoteDataSourceProvider = Provider<UserRemoteDataSource>(
   (ref) => UserRemoteDataSource(ref.read(dioProvider)),
@@ -13,6 +14,10 @@ final userRepositoryProvider = Provider<UserRepository>(
   (ref) => UserRepository(ref.read(userRemoteDataSourceProvider)),
 );
 
-final usersProvider = FutureProvider<List<User>>((ref) async {
-  return ref.read(userRepositoryProvider).getUsers();
-});
+// final usersProvider = FutureProvider<List<User>>((ref) async {
+//   return ref.read(userRepositoryProvider).getUsers();
+// });
+
+final usersProvider = AsyncNotifierProvider<UsersNotifier, List<User>>(
+  (UsersNotifier.new),
+);

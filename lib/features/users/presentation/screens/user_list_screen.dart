@@ -16,23 +16,34 @@ class UserListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Users')),
-      body: users.when(
-        loading: () => const CircularProgressIndicator(),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(usersProvider.notifier).refresh();
+        },
+        child: users.when(
+          loading: () => Center(child: const CircularProgressIndicator()),
 
-        error: (e, s) => ErrorView(message: e.toString()),
+          error: (e, s) => ErrorView(message: e.toString()),
 
-        data: (users) {
-          return ListView.builder(
-            itemCount: users.length,
-            itemBuilder: (_, index) {
-              return UserCard(
-                user: users[index],
-                onTap: () {
-                  context.push(AppRoutes.userDetails, extra: users[index]);
-                },
-              );
-            },
-          );
+          data: (users) {
+            return ListView.builder(
+              itemCount: users.length,
+              itemBuilder: (_, index) {
+                return UserCard(
+                  user: users[index],
+                  onTap: () {
+                    context.push(AppRoutes.userDetails, extra: users[index]);
+                  },
+                );
+              },
+            );
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.refresh),
+        onPressed: () {
+          ref.read(usersProvider.notifier).refresh();
         },
       ),
     );
