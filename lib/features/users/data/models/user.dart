@@ -1,26 +1,16 @@
-class User {
-  final int id;
-  final String name;
-  final String username;
-  final String email;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  User({
-    required this.id,
-    required this.name,
-    required this.username,
-    required this.email,
-  });
+part 'user.freezed.dart';
+part 'user.g.dart';
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'],
-      name: json['name'],
-      username: json['username'],
-      email: json['email'],
-    );
-  }
+@freezed
+class User with _$User {
+  const factory User({
+    required int id,
+    required String name,
+    required String username,
+    required String email,
+  }) = _User;
 
-  Map<String, dynamic> toJson() {
-    return {'id': id, 'name': name, 'username': username, 'email': email};
-  }
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }
