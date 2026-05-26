@@ -4,15 +4,41 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/widgets/error_view.dart';
-import '../../data/models/user.dart';
 import '../providers/user_provider.dart';
 import '../widgets/user_card.dart';
 
-class UserListScreen extends ConsumerWidget {
+class UserListScreen extends ConsumerStatefulWidget {
   const UserListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UserListScreen> createState() => _UserListScreenState();
+}
+
+class _UserListScreenState extends ConsumerState<UserListScreen> {
+  final _scrollController = ScrollController();
+
+  @override
+  initState() {
+    super.initState();
+
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.6) {
+      ref.read(usersProvider.notifier).loadMore();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final users = ref.watch(usersProvider);
 
     return Scaffold(
@@ -39,6 +65,7 @@ class UserListScreen extends ConsumerWidget {
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: users.length,
+                    controller: _scrollController,
                     itemBuilder: (_, index) {
                       return UserCard(
                         user: users[index],

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import '../../../../core/exceptions/app_exception.dart';
 import '../models/user.dart';
 
@@ -7,13 +8,17 @@ class UserRemoteDataSource {
 
   UserRemoteDataSource(this.dio);
 
-  Future<List<User>> getUsers() async {
+  Future<List<User>> getUsers({required int pageNumber, int limit = 7}) async {
     try {
-      final response = await dio.get('/users?page=1');
+      final response = await dio.get(
+        '/users?page=$pageNumber&page_size=$limit',
+      );
 
       final List users = response.data;
 
-      return users.map((json) => User.fromJson(json)).toList();
+      final allUsers = users.map((json) => User.fromJson(json)).toList();
+
+      return allUsers.skip((pageNumber - 1) * limit).take(limit).toList();
     } on DioException catch (e) {
       throw AppException.fromDio(e);
     }

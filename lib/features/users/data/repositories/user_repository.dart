@@ -6,8 +6,8 @@ class UserRepository {
 
   UserRepository(this.remoteDataSource);
 
-  Future<List<User>> getUsers() async {
-    return await remoteDataSource.getUsers();
+  Future<List<User>> getUsers({required int pageNumber}) async {
+    return await remoteDataSource.getUsers(pageNumber: pageNumber);
   }
 
   Future<User> getUser(int id) async {
