@@ -24,8 +24,6 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
     _allUsers.clear();
     _allUsers.addAll(users);
 
-    _currentPage++;
-
     return _allUsers;
   }
 
@@ -39,8 +37,6 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
     _allUsers.clear();
     _allUsers.addAll(users);
 
-    _currentPage++;
-
     _applySearch();
   }
 
@@ -52,7 +48,7 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
     _isLoading = true;
 
     try {
-      final users = await userRepository.getUsers(pageNumber: _currentPage);
+      final users = await userRepository.getUsers(pageNumber: _currentPage + 1);
 
       _allUsers.addAll(users);
 
