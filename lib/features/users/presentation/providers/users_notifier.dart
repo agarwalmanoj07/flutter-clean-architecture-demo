@@ -51,17 +51,21 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
 
     _isLoading = true;
 
-    final users = await userRepository.getUsers(pageNumber: _currentPage);
+    try {
+      final users = await userRepository.getUsers(pageNumber: _currentPage);
 
-    _allUsers.addAll(users);
+      _allUsers.addAll(users);
 
-    _currentPage++;
+      _currentPage++;
 
-    _hasMore = users.isNotEmpty;
+      _hasMore = users.isNotEmpty;
 
-    _applySearch();
+      _applySearch();
 
-    _isLoading = false;
+      _isLoading = false;
+    } finally {
+      _isLoading = false;
+    }
   }
 
   void search(String query) {
