@@ -43,6 +43,7 @@ dependencies:
   flutter_screenutil: ^5.9.3
   logger: ^2.5.0
   shared_preferences: ^2.5.5
+  flutter_secure_storage: ^10.3.1
 
 dev_dependencies:
   flutter_test:
