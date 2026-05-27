@@ -42,6 +42,7 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter_screenutil: ^5.9.3
   logger: ^2.5.0
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

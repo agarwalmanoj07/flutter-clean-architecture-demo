@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routes/app_router.dart';
-import '../../../../core/widgets/error_view.dart';
+import '../../../../shared/widgets/error_view.dart';
 import '../providers/user_provider.dart';
 import '../widgets/user_card.dart';
 
@@ -51,6 +51,8 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
               ref.read(usersProvider.notifier).search(query);
             },
           ),
+          if (ref.read(usersProvider.notifier).isCachedData)
+            ErrorView(message: 'Showing cached data'),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {

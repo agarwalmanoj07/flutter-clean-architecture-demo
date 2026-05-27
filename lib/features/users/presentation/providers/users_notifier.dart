@@ -15,14 +15,20 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
 
   String _searchQuery = '';
 
+  bool _isCachedData = false;
+
   UserRepository get userRepository => ref.read(userRepositoryProvider);
+
+  bool get isCachedData => _isCachedData;
 
   @override
   Future<List<User>> build() async {
-    final users = await userRepository.getUsers(pageNumber: _currentPage);
+    final dataResult = await userRepository.getUsers(pageNumber: _currentPage);
 
     _allUsers.clear();
-    _allUsers.addAll(users);
+    _allUsers.addAll(dataResult.data ?? []);
+
+    _isCachedData = dataResult.isCacheData;
 
     return _allUsers;
   }
@@ -32,11 +38,12 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
 
     clearPaginationState();
 
-    final users = await userRepository.getUsers(pageNumber: _currentPage);
+    final dataResult = await userRepository.getUsers(pageNumber: _currentPage);
 
     _allUsers.clear();
-    _allUsers.addAll(users);
+    _allUsers.addAll(dataResult.data ?? []);
 
+    _isCachedData = dataResult.isCacheData;
     _applySearch();
   }
 
@@ -48,13 +55,17 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
     _isLoading = true;
 
     try {
-      final users = await userRepository.getUsers(pageNumber: _currentPage + 1);
+      final dataResult = await userRepository.getUsers(
+        pageNumber: _currentPage + 1,
+      );
 
-      _allUsers.addAll(users);
+      _allUsers.addAll(dataResult.data ?? []);
+
+      _isCachedData = dataResult.isCacheData;
 
       _currentPage++;
 
-      _hasMore = users.isNotEmpty;
+      _hasMore = dataResult.data?.isNotEmpty ?? false;
 
       _applySearch();
 

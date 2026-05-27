@@ -1,32 +1,30 @@
+import '../../../../core/results/data_result.dart';
+import '../datasources/user_local_datasource.dart';
 import '../datasources/user_remote_datasource.dart';
 import '../models/user.dart';
 
-class UserRepository {
+abstract class UserRepository {
+  Future<DataResult<List<User>>> getUsers({required int pageNumber});
+}
+
+class UserRepositoryImpl implements UserRepository {
   final UserRemoteDataSource remoteDataSource;
+  final UserLocalDataSource localDataSource;
 
-  UserRepository(this.remoteDataSource);
+  UserRepositoryImpl(this.remoteDataSource, this.localDataSource);
 
-  Future<List<User>> getUsers({required int pageNumber}) async {
-    return await remoteDataSource.getUsers(pageNumber: pageNumber);
-  }
-
-  Future<User> getUser(int id) async {
-    return await remoteDataSource.getUser(id);
-  }
-
-  Future<User> createUser(User user) async {
-    return await remoteDataSource.createUser(user);
-  }
-
-  Future<User> updateUser(User user) async {
-    return await remoteDataSource.updateUser(user);
-  }
-
-  Future<void> deleteUser(int id) async {
-    await remoteDataSource.deleteUser(id);
-  }
-
-  Future<void> deleteAllUsers() async {
-    await remoteDataSource.deleteAllUsers();
+  @override
+  Future<DataResult<List<User>>> getUsers({required int pageNumber}) async {
+    try {
+      return DataResult(
+        data: await remoteDataSource.getUsers(pageNumber: pageNumber),
+        isCacheData: false,
+      );
+    } catch (e) {
+      return DataResult(
+        data: await localDataSource.getUsers(),
+        isCacheData: true,
+      );
+    }
   }
 }
