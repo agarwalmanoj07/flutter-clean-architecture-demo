@@ -23,10 +23,6 @@ final userRepositoryProvider = Provider<UserRepository>(
   ),
 );
 
-// final usersProvider = FutureProvider<List<User>>((ref) async {
-//   return ref.read(userRepositoryProvider).getUsers();
-// });
-
 final usersProvider = AsyncNotifierProvider<UsersNotifier, List<User>>(
   (UsersNotifier.new),
 );
