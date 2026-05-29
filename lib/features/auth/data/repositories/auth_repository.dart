@@ -6,12 +6,12 @@ import '../datasources/auth_remote_data_source.dart';
 import '../models/auth_tokens.dart';
 
 abstract class AuthRepository {
-  Future<void> signInWithEmailAndPassword({
+  Future<void> signUpWithEmailAndPassword({
     required String email,
     required String password,
   });
 
-  Future<void> signUpWithEmailAndPassword({
+  Future<void> signInWithEmailAndPassword({
     required String email,
     required String password,
   });
@@ -20,9 +20,11 @@ abstract class AuthRepository {
 
   Future<void> logout();
 
-  Future<AuthTokens?> getCurrentAuthTokens();
+  Future<AuthTokens?> getAuthTokens();
 
   Future<void> clearTokens();
+
+  Future<AuthTokens> refreshTokens(String refreshToken);
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -30,6 +32,15 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthLocalDataSource localDataSource;
 
   AuthRepositoryImpl(this.remoteDataSource, this.localDataSource);
+
+  @override
+  Future<AuthTokens> signUpWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) {
+    // TODO: implement signUpWithEmailAndPassword
+    throw UnimplementedError();
+  }
 
   @override
   Future<void> signInWithEmailAndPassword({
@@ -49,15 +60,6 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AuthTokens> signUpWithEmailAndPassword({
-    required String email,
-    required String password,
-  }) {
-    // TODO: implement signUpWithEmailAndPassword
-    throw UnimplementedError();
-  }
-
-  @override
   Future<bool> isLoggedIn() async {
     try {
       return await localDataSource.getTokens().then((tokens) => tokens != null);
@@ -68,7 +70,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AuthTokens?> getCurrentAuthTokens() {
+  Future<AuthTokens?> getAuthTokens() {
     try {
       return localDataSource.getTokens();
     } catch (e) {
@@ -90,6 +92,23 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> clearTokens() {
     // TODO: implement clearTokens
     throw UnimplementedError();
+  }
+
+  @override
+  Future<AuthTokens> refreshTokens(String refreshToken) async {
+    final currentTokens = await localDataSource.getTokens();
+
+    if (currentTokens == null) {
+      throw AppException('Session expired');
+    }
+
+    final newTokens = await remoteDataSource.refreshToken(
+      currentTokens.refreshToken,
+    );
+
+    await localDataSource.saveTokens(newTokens);
+
+    return newTokens;
   }
 }
 
