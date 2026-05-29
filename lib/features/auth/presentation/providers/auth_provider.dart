@@ -23,7 +23,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   @override
   Future<AuthState> build() async {
     final isLoggedIn = await authRepository.isLoggedIn();
-    final authTokens = await authRepository.getCurrentAuthTokens();
+    final authTokens = await authRepository.getAuthTokens();
 
     return AuthState(isLoggedIn: isLoggedIn, authTokens: authTokens);
   }
@@ -40,7 +40,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     );
 
     final isLoggedIn = await authRepository.isLoggedIn();
-    final authTokens = await authRepository.getCurrentAuthTokens();
+    final authTokens = await authRepository.getAuthTokens();
 
     final currentState = state.valueOrNull;
 
@@ -69,7 +69,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     await authRepository.logout();
 
     final isLoggedIn = await authRepository.isLoggedIn();
-    final authTokens = await authRepository.getCurrentAuthTokens();
+    final authTokens = await authRepository.getAuthTokens();
 
     final currentState = state.valueOrNull;
 
@@ -84,7 +84,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
 
   Future<void> checkAuthStatus() async {
     final isLoggedIn = await authRepository.isLoggedIn();
-    final authTokens = await authRepository.getCurrentAuthTokens();
+    final authTokens = await authRepository.getAuthTokens();
 
     state = AsyncValue.data(
       AuthState(isLoggedIn: isLoggedIn, authTokens: authTokens),

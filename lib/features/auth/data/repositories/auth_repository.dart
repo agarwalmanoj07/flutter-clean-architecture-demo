@@ -24,7 +24,7 @@ abstract class AuthRepository {
 
   Future<void> clearTokens();
 
-  Future<AuthTokens> refreshTokens(String refreshToken);
+  Future<AuthTokens> refreshTokens();
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -95,7 +95,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AuthTokens> refreshTokens(String refreshToken) async {
+  Future<AuthTokens> refreshTokens() async {
     final currentTokens = await localDataSource.getTokens();
 
     if (currentTokens == null) {

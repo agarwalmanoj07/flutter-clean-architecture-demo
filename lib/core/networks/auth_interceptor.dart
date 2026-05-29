@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_clean_architecture_demo/features/auth/data/datasources/auth_local_data_source.dart';
-import 'package:flutter_clean_architecture_demo/features/auth/data/models/auth_tokens.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AuthInterceptor extends Interceptor {
@@ -22,8 +21,6 @@ class AuthInterceptor extends Interceptor {
     if (tokens != null) {
       options.headers['Authorization'] = 'Bearer ${tokens.accessToken}';
     }
-
-    print('Authorization: Bearer ${tokens?.accessToken}');
 
     super.onRequest(options, handler);
   }
