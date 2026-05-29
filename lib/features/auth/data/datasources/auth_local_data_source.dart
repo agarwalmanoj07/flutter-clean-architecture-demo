@@ -1,6 +1,8 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../../../core/exceptions/app_exception.dart';
+import '../../../../core/storage/secure_storage_provider.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../models/auth_tokens.dart';
 
@@ -61,3 +63,8 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     }
   }
 }
+
+final authLocalDataSourceProvider = Provider<AuthLocalDataSource>(
+  (ref) =>
+      AuthLocalDataSourceImpl(secureStorage: ref.read(secureStorageProvider)),
+);

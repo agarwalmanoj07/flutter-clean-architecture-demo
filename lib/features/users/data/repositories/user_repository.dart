@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/results/data_result.dart';
 import '../datasources/user_local_datasource.dart';
 import '../datasources/user_remote_datasource.dart';
@@ -16,15 +18,23 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<DataResult<List<User>>> getUsers({required int pageNumber}) async {
     try {
-      return DataResult(
-        data: await remoteDataSource.getUsers(pageNumber: pageNumber),
-        isCacheData: false,
+      final dataResult = await remoteDataSource.getUsers(
+        pageNumber: pageNumber,
       );
+
+      await localDataSource.saveUsers(dataResult);
+
+      return DataResult(data: dataResult, isCacheData: false);
     } catch (e) {
-      return DataResult(
-        data: await localDataSource.getUsers(),
-        isCacheData: true,
-      );
+      final cachedUsers = await localDataSource.getUsers();
+      return DataResult(data: cachedUsers, isCacheData: true);
     }
   }
 }
+
+final userRepositoryProvider = Provider<UserRepository>(
+  (ref) => UserRepositoryImpl(
+    ref.read(userRemoteDataSourceProvider),
+    ref.read(userLocalDataSourceProvider),
+  ),
+);

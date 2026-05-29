@@ -2,9 +2,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/user.dart';
 import '../../data/repositories/user_repository.dart';
-import 'user_provider.dart';
 
-class UsersNotifier extends AsyncNotifier<List<User>> {
+class UsersState {
+  final List<User> users;
+  final bool isCachedData;
+
+  UsersState({required this.users, required this.isCachedData});
+
+  UsersState copyWith({List<User>? users, bool? isCachedData}) {
+    return UsersState(
+      users: users ?? this.users,
+      isCachedData: isCachedData ?? this.isCachedData,
+    );
+  }
+}
+
+class UsersNotifier extends AsyncNotifier<UsersState> {
   final List<User> _allUsers = [];
 
   int _currentPage = 1;
@@ -15,22 +28,17 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
 
   String _searchQuery = '';
 
-  bool _isCachedData = false;
-
   UserRepository get userRepository => ref.read(userRepositoryProvider);
 
-  bool get isCachedData => _isCachedData;
-
   @override
-  Future<List<User>> build() async {
+  Future<UsersState> build() async {
     final dataResult = await userRepository.getUsers(pageNumber: _currentPage);
 
     _allUsers.clear();
+
     _allUsers.addAll(dataResult.data ?? []);
 
-    _isCachedData = dataResult.isCacheData;
-
-    return _allUsers;
+    return UsersState(users: _allUsers, isCachedData: dataResult.isCacheData);
   }
 
   Future<void> refresh() async {
@@ -41,9 +49,24 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
     final dataResult = await userRepository.getUsers(pageNumber: _currentPage);
 
     _allUsers.clear();
+
     _allUsers.addAll(dataResult.data ?? []);
 
-    _isCachedData = dataResult.isCacheData;
+    final currentState = state.valueOrNull;
+
+    if (currentState != null) {
+      state = AsyncValue.data(
+        currentState.copyWith(
+          users: _allUsers,
+          isCachedData: dataResult.isCacheData,
+        ),
+      );
+    } else {
+      state = AsyncValue.data(
+        UsersState(users: _allUsers, isCachedData: dataResult.isCacheData),
+      );
+    }
+
     _applySearch();
   }
 
@@ -61,7 +84,10 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
 
       _allUsers.addAll(dataResult.data ?? []);
 
-      _isCachedData = dataResult.isCacheData;
+      state = AsyncValue.data(
+        state.valueOrNull?.copyWith(users: _allUsers) ??
+            UsersState(users: _allUsers, isCachedData: dataResult.isCacheData),
+      );
 
       _currentPage++;
 
@@ -81,8 +107,14 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
   }
 
   void _applySearch() {
+    final currentState = state.valueOrNull;
+
+    if (currentState == null) {
+      return;
+    }
+
     if (_searchQuery.isEmpty) {
-      state = AsyncValue.data(_allUsers);
+      state = AsyncValue.data(currentState.copyWith(users: _allUsers));
     } else {
       final filteredUsers = _allUsers
           .where(
@@ -92,7 +124,7 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
           )
           .toList();
 
-      state = AsyncValue.data(filteredUsers);
+      state = AsyncValue.data(currentState.copyWith(users: filteredUsers));
     }
   }
 
@@ -109,7 +141,7 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
 
   void clearUsers() {
     _allUsers.clear();
-    state = const AsyncValue.data([]);
+    state = AsyncValue.data(UsersState(users: [], isCachedData: false));
   }
 
   void clearState() {
@@ -120,6 +152,13 @@ class UsersNotifier extends AsyncNotifier<List<User>> {
 
   void sortUsers() {
     _allUsers.sort((a, b) => a.name.compareTo(b.name));
-    state = AsyncValue.data(_allUsers);
+    state = AsyncValue.data(
+      state.valueOrNull?.copyWith(users: _allUsers) ??
+          UsersState(users: _allUsers, isCachedData: false),
+    );
   }
 }
+
+final usersProvider = AsyncNotifierProvider<UsersNotifier, UsersState>(
+  (UsersNotifier.new),
+);

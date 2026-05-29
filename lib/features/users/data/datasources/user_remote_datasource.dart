@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/exceptions/app_exception.dart';
+import '../../../../core/networks/dio_provider.dart';
 import '../models/user.dart';
 
 abstract class UserRemoteDataSource {
@@ -19,7 +21,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   }) async {
     try {
       final response = await dio.get(
-        '/users?page=$pageNumber&page_size=$pageSize',
+        '/userss?page=$pageNumber&page_size=$pageSize',
       );
 
       final List users = response.data;
@@ -30,3 +32,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
     }
   }
 }
+
+final userRemoteDataSourceProvider = Provider<UserRemoteDataSource>(
+  (ref) => UserRemoteDataSourceImpl(ref.read(dioProvider)),
+);

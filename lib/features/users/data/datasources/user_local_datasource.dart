@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/storage/shared_preferences_provider.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../models/user.dart';
 
@@ -33,8 +35,16 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
       return [];
     }
 
-    final userJsonList = jsonDecode(jsonString);
+    final List<dynamic> userJsonList = jsonDecode(jsonString);
 
-    return userJsonList.map((json) => User.fromJson(json)).toList();
+    final users = userJsonList
+        .map<User>((json) => User.fromJson(json as Map<String, dynamic>))
+        .toList();
+
+    return users;
   }
 }
+
+final userLocalDataSourceProvider = Provider<UserLocalDataSource>((ref) {
+  return UserLocalDataSourceImpl(ref.read(sharedPreferencesProvider));
+});

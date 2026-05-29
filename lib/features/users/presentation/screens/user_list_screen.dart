@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../../../../shared/widgets/error_view.dart';
-import '../providers/user_provider.dart';
+import '../providers/users_provider.dart';
 import '../widgets/user_card.dart';
 
 class UserListScreen extends ConsumerStatefulWidget {
@@ -39,7 +39,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final users = ref.watch(usersProvider);
+    final usersState = ref.watch(usersProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Users')),
@@ -51,34 +51,57 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
               ref.read(usersProvider.notifier).search(query);
             },
           ),
-          if (ref.read(usersProvider.notifier).isCachedData)
-            ErrorView(message: 'Showing cached data'),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
                 await ref.read(usersProvider.notifier).refresh();
               },
-              child: users.when(
+              child: usersState.when(
                 loading: () => Center(child: const CircularProgressIndicator()),
 
-                error: (e, s) => ErrorView(message: e.toString()),
+                error: (e, s) {
+                  return ErrorView(message: e.toString());
+                },
 
-                data: (users) {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: users.length,
-                    controller: _scrollController,
-                    itemBuilder: (_, index) {
-                      return UserCard(
-                        user: users[index],
-                        onTap: () {
-                          context.push(
-                            AppRoutes.userDetails,
-                            extra: users[index],
-                          );
-                        },
-                      );
-                    },
+                data: (usersState) {
+                  final users = usersState.users;
+                  final isCachedData = usersState.isCachedData;
+
+                  if (users.isEmpty) {
+                    return const Center(child: Text('No users found'));
+                  }
+
+                  return Column(
+                    children: [
+                      if (isCachedData)
+                        Container(
+                          width: double.infinity,
+                          color: Colors.amber,
+                          padding: const EdgeInsets.all(8.0),
+                          child: const Text(
+                            'Showing cached data. Pull to refresh.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: usersState.users.length,
+                          controller: _scrollController,
+                          itemBuilder: (_, index) {
+                            return UserCard(
+                              user: users[index],
+                              onTap: () {
+                                context.push(
+                                  AppRoutes.userDetails,
+                                  extra: users[index],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   );
                 },
               ),
