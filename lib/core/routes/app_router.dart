@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/auth_screen.dart';
+import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/users/data/models/user.dart';
 import '../../features/users/presentation/screens/user_details_screen.dart';
 import '../../features/users/presentation/screens/user_list_screen.dart';
@@ -13,23 +14,33 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final auth = ref.watch(authProvider);
 
   return GoRouter(
-    initialLocation: AppRoutes.auth,
+    initialLocation: AppRoutes.splash,
     redirect: (context, state) {
+      if (auth.isLoading) {
+        return null;
+      }
+
       final authState = auth.valueOrNull;
 
       if (authState == null) {
-        return AppRoutes.auth;
+        return AppRoutes.login;
       }
 
       final isLoggedIn = authState.isLoggedIn;
 
-      final isAuthRoute = state.matchedLocation == AppRoutes.auth;
+      final isSplashRoute = state.matchedLocation == AppRoutes.splash;
 
-      if (!isLoggedIn && !isAuthRoute) {
-        return AppRoutes.auth;
+      final isLoginRoute = state.matchedLocation == AppRoutes.login;
+
+      if (isSplashRoute) {
+        return isLoggedIn ? AppRoutes.userList : AppRoutes.login;
       }
 
-      if (isLoggedIn && isAuthRoute) {
+      if (!isLoggedIn) {
+        return AppRoutes.login;
+      }
+
+      if (isLoginRoute) {
         return AppRoutes.userList;
       }
 
@@ -37,7 +48,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(
-        path: AppRoutes.auth,
+        path: AppRoutes.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.login,
         builder: (context, state) => const AuthScreen(),
       ),
       GoRoute(

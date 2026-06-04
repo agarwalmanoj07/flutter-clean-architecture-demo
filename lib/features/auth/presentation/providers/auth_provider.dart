@@ -28,7 +28,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     required String email,
     required String password,
   }) async {
-    state = const AsyncLoading();
+    state = const AsyncValue.loading();
 
     await _authRepository.signInWithEmailAndPassword(
       email: email,
@@ -38,33 +38,26 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     final isLoggedIn = await _authRepository.isLoggedIn();
     final authTokens = await _authRepository.getAuthTokens();
 
-    final currentState = state.valueOrNull;
-
-    if (currentState == null) {
-      return;
-    }
-
     state = AsyncValue.data(
-      currentState.copyWith(isLoggedIn: isLoggedIn, authTokens: authTokens),
+      AuthState(isLoggedIn: isLoggedIn, authTokens: authTokens),
     );
   }
 
   Future<void> isLoggedIn() async {
     state = const AsyncValue.loading();
 
-    final currentState = state.valueOrNull;
-
-    if (currentState == null) {
-      return;
-    }
-
     final isLoggedIn = await _authRepository.isLoggedIn();
 
-    state = AsyncValue.data(currentState.copyWith(isLoggedIn: isLoggedIn));
+    state = AsyncValue.data(
+      AuthState(
+        isLoggedIn: isLoggedIn,
+        authTokens: state.valueOrNull?.authTokens,
+      ),
+    );
   }
 
   Future<void> logout() async {
-    state = const AsyncLoading();
+    state = const AsyncValue.loading();
 
     await _authRepository.logout();
 
