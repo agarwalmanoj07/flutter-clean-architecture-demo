@@ -11,7 +11,6 @@ class AuthScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
-
     final authNotifier = ref.read(authProvider.notifier);
 
     return Scaffold(
@@ -25,7 +24,7 @@ class AuthScreen extends ConsumerWidget {
                 if (authState.isLoggedIn) {
                   return Column(
                     children: [
-                      Text('Logged in with tokens: ${authState.authTokens}'),
+                      Text('Logged in: ${authState.isLoggedIn}'),
                       ElevatedButton(
                         onPressed: () {
                           context.push(AppRoutes.userList);

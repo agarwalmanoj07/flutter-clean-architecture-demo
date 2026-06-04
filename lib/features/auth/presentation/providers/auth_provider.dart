@@ -1,31 +1,27 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/models/auth_tokens.dart';
 import '../../data/repositories/auth_repository.dart';
-
-class AuthState {
-  final bool isLoggedIn;
-  final AuthTokens? authTokens;
-
-  AuthState({required this.isLoggedIn, this.authTokens});
-
-  AuthState copyWith({bool? isLoggedIn, AuthTokens? authTokens}) {
-    return AuthState(
-      isLoggedIn: isLoggedIn ?? this.isLoggedIn,
-      authTokens: authTokens ?? this.authTokens,
-    );
-  }
-}
+import 'auth_state.dart';
 
 class AuthNotifier extends AsyncNotifier<AuthState> {
-  AuthRepository get authRepository => ref.read(authRepositoryProvider);
+  AuthRepository get _authRepository => ref.read(authRepositoryProvider);
 
   @override
   Future<AuthState> build() async {
-    final isLoggedIn = await authRepository.isLoggedIn();
-    final authTokens = await authRepository.getAuthTokens();
+    final isLoggedIn = await _authRepository.isLoggedIn();
+    final authTokens = await _authRepository.getAuthTokens();
 
     return AuthState(isLoggedIn: isLoggedIn, authTokens: authTokens);
+  }
+
+  Future<void> signUpWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    await _authRepository.signUpWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
 
   Future<void> signInWithEmailAndPassword({
@@ -34,13 +30,13 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   }) async {
     state = const AsyncLoading();
 
-    await authRepository.signInWithEmailAndPassword(
+    await _authRepository.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
 
-    final isLoggedIn = await authRepository.isLoggedIn();
-    final authTokens = await authRepository.getAuthTokens();
+    final isLoggedIn = await _authRepository.isLoggedIn();
+    final authTokens = await _authRepository.getAuthTokens();
 
     final currentState = state.valueOrNull;
 
@@ -53,23 +49,27 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     );
   }
 
-  Future<void> signUpWithEmailAndPassword({
-    required String email,
-    required String password,
-  }) async {
-    await authRepository.signUpWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+  Future<void> isLoggedIn() async {
+    state = const AsyncValue.loading();
+
+    final currentState = state.valueOrNull;
+
+    if (currentState == null) {
+      return;
+    }
+
+    final isLoggedIn = await _authRepository.isLoggedIn();
+
+    state = AsyncValue.data(currentState.copyWith(isLoggedIn: isLoggedIn));
   }
 
   Future<void> logout() async {
     state = const AsyncLoading();
 
-    await authRepository.logout();
+    await _authRepository.logout();
 
-    final isLoggedIn = await authRepository.isLoggedIn();
-    final authTokens = await authRepository.getAuthTokens();
+    final isLoggedIn = await _authRepository.isLoggedIn();
+    final authTokens = await _authRepository.getAuthTokens();
 
     final currentState = state.valueOrNull;
 
@@ -82,20 +82,11 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     );
   }
 
-  Future<void> checkAuthStatus() async {
-    final isLoggedIn = await authRepository.isLoggedIn();
-    final authTokens = await authRepository.getAuthTokens();
-
-    state = AsyncValue.data(
-      AuthState(isLoggedIn: isLoggedIn, authTokens: authTokens),
-    );
-  }
-
   Future<void> clearTokens() async {
-    await authRepository.clearTokens();
+    await _authRepository.clearTokens();
   }
 }
 
 final authProvider = AsyncNotifierProvider<AuthNotifier, AuthState>(
-  () => AuthNotifier(),
+  AuthNotifier.new,
 );
