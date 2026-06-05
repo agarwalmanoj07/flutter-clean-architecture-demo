@@ -2,20 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/user.dart';
 import '../../data/repositories/user_repository.dart';
-
-class UsersState {
-  final List<User> users;
-  final bool isCachedData;
-
-  UsersState({required this.users, required this.isCachedData});
-
-  UsersState copyWith({List<User>? users, bool? isCachedData}) {
-    return UsersState(
-      users: users ?? this.users,
-      isCachedData: isCachedData ?? this.isCachedData,
-    );
-  }
-}
+import 'users_state.dart';
 
 class UsersNotifier extends AsyncNotifier<UsersState> {
   final List<User> _allUsers = [];
