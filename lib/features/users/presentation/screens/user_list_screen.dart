@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/routes/app_routes.dart';
+import '../../../../core/routers/app_routes.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../providers/users_provider.dart';
 import '../widgets/user_card.dart';

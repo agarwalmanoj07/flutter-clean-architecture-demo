@@ -9,13 +9,17 @@ import '../../features/users/data/models/user.dart';
 import '../../features/users/presentation/screens/user_details_screen.dart';
 import '../../features/users/presentation/screens/user_list_screen.dart';
 import 'app_routes.dart';
+import 'router_refresh_provider.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final auth = ref.watch(authProvider);
+  final routerRefreshNotifier = ref.read(routerRefreshProvider);
 
   return GoRouter(
     initialLocation: AppRoutes.splash,
+    refreshListenable: routerRefreshNotifier,
     redirect: (context, state) {
+      final auth = ref.read(authProvider);
+
       if (auth.isLoading) {
         return null;
       }
@@ -32,15 +36,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       final isLoginRoute = state.matchedLocation == AppRoutes.login;
 
-      if (isSplashRoute) {
-        return isLoggedIn ? AppRoutes.userList : AppRoutes.login;
-      }
-
       if (!isLoggedIn) {
-        return AppRoutes.login;
+        return isLoginRoute ? null : AppRoutes.login;
       }
 
-      if (isLoginRoute) {
+      if (isSplashRoute || isLoginRoute) {
         return AppRoutes.userList;
       }
 
