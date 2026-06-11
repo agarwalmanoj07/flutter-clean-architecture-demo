@@ -29,7 +29,7 @@ class UsersNotifier extends AsyncNotifier<UsersState> {
   }
 
   Future<void> refresh() async {
-    state = const AsyncLoading();
+    state = const AsyncValue.loading();
 
     clearPaginationState();
 
@@ -39,20 +39,9 @@ class UsersNotifier extends AsyncNotifier<UsersState> {
 
     _allUsers.addAll(dataResult.data ?? []);
 
-    final currentState = state.valueOrNull;
-
-    if (currentState != null) {
-      state = AsyncValue.data(
-        currentState.copyWith(
-          users: _allUsers,
-          isCachedData: dataResult.isCacheData,
-        ),
-      );
-    } else {
-      state = AsyncValue.data(
-        UsersState(users: _allUsers, isCachedData: dataResult.isCacheData),
-      );
-    }
+    state = AsyncValue.data(
+      UsersState(users: _allUsers, isCachedData: dataResult.isCacheData),
+    );
 
     _applySearch();
   }
