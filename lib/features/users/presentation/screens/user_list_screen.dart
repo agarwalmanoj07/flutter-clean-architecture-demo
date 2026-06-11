@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/routers/app_routes.dart';
 import '../../../../shared/widgets/error_view.dart';
-import '../providers/users_provider.dart';
+import '../providers/users_notifier.dart';
 import '../widgets/user_card.dart';
 
 class UserListScreen extends ConsumerStatefulWidget {

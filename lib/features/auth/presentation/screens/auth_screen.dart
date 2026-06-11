@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routers/app_routes.dart';
-import '../providers/auth_provider.dart';
+import '../providers/auth_notifier.dart';
 
 class AuthScreen extends ConsumerWidget {
   const AuthScreen({super.key});
